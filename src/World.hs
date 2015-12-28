@@ -31,11 +31,8 @@ noMoreConsums (World _ consums) = consums == S.empty
 
 
 movePlayer :: Integer -> Integer -> World -> Curses World
-movePlayer x' y' (World (Player x y points) consums) = do
-  (h, w) <- screenSize
-  let x'' = (x + x') `mod` w
-      y'' = (y + y') `mod` h
-  return $ World (Player x'' y'' points) consums
+movePlayer x y (World (Player _ _ points) consums) =
+  return (World (Player x y points) consums)
 
 reduceConsumables :: World -> World
 reduceConsumables world@(World (Player x y points) consums) =

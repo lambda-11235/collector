@@ -2,8 +2,10 @@
 module Main where
 
 import Control.Monad.IO.Class
+import Control.Wire
 import UI.NCurses
 
+import Logic
 import World
 
 main :: IO ()
@@ -21,23 +23,30 @@ main = do (world', turns) <- runCurses $ do setEcho False
 
 run :: World -> Integer -> Curses (World, Integer)
 run world turn = do
+  (h, w) <- screenSize
+  runNetwork world turn clockSession_ (horizPos w) (vertPos h)
+
+runNetwork world turn session horizPos vertPos = do
   win <- defaultWindow
   updateWindow win $ drawWorld world
   render
 
   ev <- getEvent win Nothing
 
-  if ev == (Just (EventCharacter 'q')) then
+  if ev == (Just (EventCharacter 'q'))
+     || ev == (Just (EventCharacter 'Q'))
+  then
     return (world, turn)
   else
-    do world' <- fmap reduceConsumables $ case ev of
-         (Just (EventCharacter 'a')) -> movePlayer (-1) 0 world
-         (Just (EventCharacter 'd')) -> movePlayer 1 0 world
-         (Just (EventCharacter 'w')) -> movePlayer 0 (-1) world
-         (Just (EventCharacter 's')) -> movePlayer 0 1 world
-         _ -> return world
+    do (s, session') <- stepSession session
+       (x, horizPos') <- stepWire horizPos s (Right ev)
+       (y, vertPos') <- stepWire vertPos s (Right ev)
+
+       world' <- fmap reduceConsumables $ case (x, y) of
+         ((Right x'), (Right y')) -> movePlayer x' y' world
+         _ -> fail $ "Movement error"
 
        if noMoreConsums world' then
          return (world', turn)
        else
-         run world' (turn + 1)
+         runNetwork world' (turn + 1) session' horizPos' vertPos'
