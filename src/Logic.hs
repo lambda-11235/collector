@@ -12,7 +12,7 @@ accumB f = loop
     loop x = mkSFN $ \y -> let x' = f x y in (x', loop x')
 
 
-horizSpeed :: Wire s () NC.Curses (Maybe NC.Event) Float
+horizSpeed :: Wire s () NC.Curses (Maybe NC.Event) Integer
 horizSpeed = mkSF_ $ \ev -> case ev of
   (Just (NC.EventCharacter 'a')) -> (-1)
   (Just (NC.EventCharacter 'A')) -> (-1)
@@ -21,10 +21,10 @@ horizSpeed = mkSF_ $ \ev -> case ev of
   _ -> 0
 
 horizPos :: (HasTime t s) => Integer -> Wire s () NC.Curses (Maybe NC.Event) Integer
-horizPos width = fmap ((`mod` width) . floor) $ accumB (+) 0 . horizSpeed
+horizPos width = fmap (`mod` width) $ accumB (+) 0 . horizSpeed
 
 
-vertSpeed :: Wire s () NC.Curses (Maybe NC.Event) Float
+vertSpeed :: Wire s () NC.Curses (Maybe NC.Event) Integer
 vertSpeed = mkSF_ $ \ev -> case ev of
   (Just (NC.EventCharacter 'w')) -> (-1)
   (Just (NC.EventCharacter 'W')) -> (-1)
@@ -33,4 +33,4 @@ vertSpeed = mkSF_ $ \ev -> case ev of
   _ -> 0
 
 vertPos :: (HasTime t s) => Integer -> Wire s () NC.Curses (Maybe NC.Event) Integer
-vertPos height = fmap ((`mod` height) . floor) $ accumB (+) 0 . vertSpeed
+vertPos height = fmap (`mod` height) $ accumB (+) 0 . vertSpeed
