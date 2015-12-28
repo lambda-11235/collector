@@ -1,0 +1,5 @@
+flags: {}
+packages:
+- '.'
+extra-deps: [ncurses-0.2.14]
+resolver: lts-3.18
