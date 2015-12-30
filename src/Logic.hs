@@ -21,7 +21,7 @@ horizSpeed = mkSF_ $ \ev -> case ev of
   _ -> 0
 
 horizPos :: (HasTime t s) => Integer -> Wire s () NC.Curses (Maybe NC.Event) Integer
-horizPos width = fmap (`mod` width) $ accumB (+) 0 . horizSpeed
+horizPos width = (`mod` width) <$> accumB (+) 0 . horizSpeed
 
 
 vertSpeed :: Wire s () NC.Curses (Maybe NC.Event) Integer
@@ -33,4 +33,4 @@ vertSpeed = mkSF_ $ \ev -> case ev of
   _ -> 0
 
 vertPos :: (HasTime t s) => Integer -> Wire s () NC.Curses (Maybe NC.Event) Integer
-vertPos height = fmap (`mod` height) $ accumB (+) 0 . vertSpeed
+vertPos height = (`mod` height) <$> accumB (+) 0 . vertSpeed
